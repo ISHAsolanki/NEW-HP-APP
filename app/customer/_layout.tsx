@@ -31,6 +31,24 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="cart"
+        options={{
+          href: null, // This hides the tab from the tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="checkout"
+        options={{
+          href: null, // This hides the tab from the tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="ordercomplete"
+        options={{
+          href: null, // This hides the tab from the tab bar
+        }}
+      />
+      <Tabs.Screen
         name="home"
         options={{
           title: 'Home',
@@ -49,7 +67,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="delivery"
+        name="orders"
         options={{
           title: 'Orders',
           tabBarIcon: ({ color, focused }) => (

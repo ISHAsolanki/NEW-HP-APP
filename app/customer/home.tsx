@@ -62,7 +62,7 @@ export default function CustomerHomeScreen() {
   };
 
   const handleCartPress = () => {
-    Alert.alert('Cart', 'Opening shopping cart...');
+    router.push('/customer/cart');
   };
 
   let [fontsLoaded] = useFonts({

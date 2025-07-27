@@ -131,7 +131,7 @@ export default function ProductsScreen() {
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Order Cylinder</Text>
         </View>
-        <TouchableOpacity style={styles.headerIcon}>
+        <TouchableOpacity style={styles.headerIcon} onPress={() => router.push('/customer/cart')}>
             <ShoppingCart size={26} color={Colors.white} />
         </TouchableOpacity>
       </View>
