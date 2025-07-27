@@ -17,10 +17,10 @@ export default function ProfileScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>JD</Text>
+            <Text style={styles.avatarText}>AB</Text>
           </View>
-          <Text style={styles.name}>John Doe</Text>
-          <Text style={styles.email}>john.doe@example.com</Text>
+          <Text style={styles.name}>Alpenbhai</Text>
+          <Text style={styles.email}>alpenbhai@example.com</Text>
           
           <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
             <Text style={styles.editButtonText}>Edit Profile</Text>
@@ -36,12 +36,36 @@ export default function ProfileScreen() {
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuItemText}>Security & Privacy</Text>
+            <Text style={styles.menuItemText}>Delivery Address</Text>
+            <Text style={styles.menuItemArrow}>›</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.menuItem}>
+            <Text style={styles.menuItemText}>Payment Methods</Text>
             <Text style={styles.menuItemArrow}>›</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.menuItem}>
             <Text style={styles.menuItemText}>Notifications</Text>
+            <Text style={styles.menuItemArrow}>›</Text>
+          </TouchableOpacity>
+        </View>
+        
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Gas Service</Text>
+          
+          <TouchableOpacity style={styles.menuItem}>
+            <Text style={styles.menuItemText}>Cylinder Information</Text>
+            <Text style={styles.menuItemArrow}>›</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.menuItem}>
+            <Text style={styles.menuItemText}>Service History</Text>
+            <Text style={styles.menuItemArrow}>›</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.menuItem}>
+            <Text style={styles.menuItemText}>Safety Guidelines</Text>
             <Text style={styles.menuItemArrow}>›</Text>
           </TouchableOpacity>
         </View>
@@ -55,12 +79,12 @@ export default function ProfileScreen() {
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuItemText}>Contact Us</Text>
+            <Text style={styles.menuItemText}>Contact Vihar Electricals</Text>
             <Text style={styles.menuItemArrow}>›</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuItemText}>About</Text>
+            <Text style={styles.menuItemText}>Emergency Support</Text>
             <Text style={styles.menuItemArrow}>›</Text>
           </TouchableOpacity>
         </View>
@@ -89,7 +113,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#0D47A1',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -111,7 +135,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   editButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#0D47A1',
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 20,

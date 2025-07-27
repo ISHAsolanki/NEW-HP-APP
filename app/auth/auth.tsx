@@ -75,12 +75,12 @@ export default function AuthScreen() {
         // Login with Firebase
         await signInWithEmailAndPassword(FIREBASE_AUTH, formData.email, formData.password);
         Alert.alert('Success', 'Login successful!');
-        router.replace('/(tabs)');
+        router.replace('/customer');
       } else {
         // Register with Firebase
         await createUserWithEmailAndPassword(FIREBASE_AUTH, formData.email, formData.password);
         Alert.alert('Success', 'Registration successful!');
-        router.replace('/(tabs)');
+        router.replace('/customer');
       }
     } catch (error: any) {
       let errorMessage = 'An error occurred. Please try again.';
@@ -131,8 +131,8 @@ export default function AuthScreen() {
           source={require('../../assets/images/hpgas-logo.png')}
           style={styles.logo}
         />
-        <Text style={styles.title}>Vihar Electricals</Text>
-        <Text style={styles.subtitle}>HP Gas Service</Text>
+        <Text style={styles.title}>HP Gas Services</Text>
+        <Text style={styles.subtitle}>Vihar Electricals</Text>
       </View>
 
       <View style={styles.formContainer}>
@@ -285,10 +285,9 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '700',
     color: Colors.white,
-    marginBottom: 4,
   },
   subtitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '400',
     color: Colors.white,
     opacity: 0.9,

@@ -1,9 +1,9 @@
 import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Tabs } from 'expo-router';
+import { House, PackageSearch, Truck, User } from 'lucide-react-native';
 import { Platform } from 'react-native';
 
 export default function TabLayout() {
@@ -27,18 +27,33 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
+          href: null, // This hides the tab from the tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="home"
+        options={{
           title: 'Home',
           tabBarIcon: ({ color, focused }) => (
-            <IconSymbol size={28} name={focused ? 'house.fill' : 'house'} color={color} />
+            <House size={24} color={focused ? color : color} fill="transparent" />
           ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="products"
         options={{
-          title: 'Explore',
+          title: 'Products',
           tabBarIcon: ({ color, focused }) => (
-            <IconSymbol size={28} name={focused ? 'paperplane.fill' : 'paperplane'} color={color} />
+            <PackageSearch size={24} color={focused ? color : color} fill="transparent" />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="delivery"
+        options={{
+          title: 'Orders',
+          tabBarIcon: ({ color, focused }) => (
+            <Truck size={24} color={focused ? color : color} fill="transparent" />
           ),
         }}
       />
@@ -47,7 +62,7 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, focused }) => (
-            <IconSymbol size={28} name={focused ? 'person.fill' : 'person'} color={color} />
+            <User size={24} color={focused ? color : color} fill="transparent" />
           ),
         }}
       />

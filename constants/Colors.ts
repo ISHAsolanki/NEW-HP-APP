@@ -22,4 +22,6 @@ export const Colors = {
   textSecondary: '#6C757D',
   border: '#E9ECEF',
   white: '#FFFFFF',
+  background: '#F0F2F5',
+  text: '#1D3557',
 };
