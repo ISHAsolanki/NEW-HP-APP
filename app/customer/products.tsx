@@ -129,7 +129,7 @@ export default function ProductsScreen() {
             <TouchableOpacity onPress={() => router.back()} style={styles.headerIcon}>
                 <ArrowLeft size={26} color={Colors.white} />
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>Order Cylinder</Text>
+            <Text style={styles.headerTitle}>Products</Text>
         </View>
         <TouchableOpacity style={styles.headerIcon} onPress={() => router.push('/customer/cart')}>
             <ShoppingCart size={26} color={Colors.white} />
@@ -199,7 +199,7 @@ export default function ProductsScreen() {
                 <Image source={selectedProduct?.image} style={styles.modalHeroImage} />
                 
                 <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
-                    <X size={24} color={Colors.white} />
+                    <X size={24} color={Colors.text} />
                 </TouchableOpacity>
 
                 {selectedProduct && (
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   },
   headerIcon: { padding: 8 },
   headerTitle: { 
-    fontSize: 16, 
+    fontSize: 20, 
     fontFamily: 'Inter_600SemiBold', 
     color: Colors.white,
     marginLeft: 12,
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: Colors.primary,
+    shadowColor: Colors.textSecondary,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.1,
     shadowRadius: 20,
@@ -408,7 +408,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 20,
     right: 20,
-    backgroundColor: 'rgba(0,0,0,0.3)',
     borderRadius: 100,
     padding: 6,
     zIndex: 10,
@@ -453,8 +452,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   modalQuantityButton: {
-    width: 48,
-    height: 48,
+    width: 42,
+    height: 42,
     borderRadius: 24, // Circle
     backgroundColor: Colors.primary, // Changed to blue
     alignItems: 'center',
@@ -469,7 +468,7 @@ const styles = StyleSheet.create({
       fontSize: 20,
       fontFamily: 'Inter_700Bold', 
       color: Colors.text, 
-      marginHorizontal: 32,
+      marginHorizontal: 26,
   },
   modalActionContainer: {
     flexDirection: 'row',

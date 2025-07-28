@@ -78,7 +78,7 @@ export default function OrderPlacedScreen() {
         </View>
       </ScrollView>
 
-      <View style={[styles.footer, { paddingBottom: insets.bottom + 10 }]}>
+      <View style={[styles.footer, { paddingBottom: insets.bottom + 70 }]}>
         <TouchableOpacity style={styles.secondaryButton} onPress={() => router.push('/customer/home')}>
             <Text style={styles.secondaryButtonText}>Go to Home</Text>
         </TouchableOpacity>

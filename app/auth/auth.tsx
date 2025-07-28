@@ -273,21 +273,21 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 30,
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 85,
+    height: 85,
     borderRadius: 15,
     marginTop: 26,
-    marginBottom: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    padding: 8,
+    marginBottom: 0,
+    padding: 2,
   },
   title: {
     fontSize: 28,
-    fontWeight: '700',
+    marginTop: 0,
+    fontWeight: '800',
     color: Colors.white,
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '400',
     color: Colors.white,
     opacity: 0.9,
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
   },
   forgotPasswordText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '500',
     color: Colors.primary,
   },
   footer: {

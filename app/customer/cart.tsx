@@ -181,7 +181,7 @@ export default function CartScreen() {
       </ScrollView>
 
       {/* Checkout Footer */}
-      <View style={[styles.footer, { paddingBottom: insets.bottom + 10 }]}>
+      <View style={[styles.footer, { paddingBottom: insets.bottom + 70 }]}>
         <View>
             <Text style={styles.footerTotalAmount}>₹{totalAmount.toFixed(2)}</Text>
             <Text style={styles.footerTotalLabel}>TOTAL</Text>

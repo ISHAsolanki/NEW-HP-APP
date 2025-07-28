@@ -279,7 +279,7 @@ export default function OrdersScreen() {
         style={styles.modalOverlay}
       >
         <View style={styles.modalOverlay}>
-            <View style={[styles.invoiceContainer, {paddingTop: insets.top + 20, paddingBottom: insets.bottom + 20}]}>
+            <View style={[styles.invoiceContainer]}>
                 <View style={styles.invoiceHeader}>
                     <Text style={styles.invoiceTitle}>Invoice</Text>
                     <TouchableOpacity onPress={() => setInvoiceVisible(false)}>
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 20,
     marginBottom: 16,
-    shadowColor: Colors.primary,
+    shadowColor: Colors.textSecondary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
     shadowRadius: 15,
@@ -541,7 +541,8 @@ const styles = StyleSheet.create({
   invoiceContainer: {
     backgroundColor: Colors.surface,
     borderRadius: 24,
-    padding: 24,
+    paddingVertical:34,
+    paddingHorizontal:26,
     width: '90%',
     height: '90%',
   },
