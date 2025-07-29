@@ -5,12 +5,14 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { Tabs } from 'expo-router';
 import { House, PackageSearch, Truck, User } from 'lucide-react-native';
 import { Platform } from 'react-native';
+import { ProtectedRoute } from '../../core/auth/ProtectedRoute';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <Tabs
+    <ProtectedRoute>
+      <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
@@ -85,5 +87,6 @@ export default function TabLayout() {
         }}
       />
     </Tabs>
+    </ProtectedRoute>
   );
 }

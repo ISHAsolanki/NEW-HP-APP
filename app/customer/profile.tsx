@@ -2,8 +2,9 @@ import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold, us
 import { router } from 'expo-router';
 import { ArrowLeft, Bell, ChevronRight, Edit, HelpCircle, Lock, LogOut, Mail, MapPin, Phone, Tag, Trash2, Truck, User, X } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Modal, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Modal, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAuth } from '../../core/auth/AuthContext';
 
 // --- Color Palette (Matched with other pages) ---
 const Colors = {
@@ -22,17 +23,7 @@ const Colors = {
   yellow: '#F59E0B',
 };
 
-// --- Mock Auth Hook ---
-const useAuth = () => ({
-  user: {
-    name: 'Alpen Bhai',
-    consumerNumber: 'HP123456789',
-    mobile: '+91 98765 43210',
-    email: 'alpen.bhai@example.com',
-    address: '123, Main Street, Near Water Tank, Vadodara, Gujarat - 390001'
-  },
-  logout: () => console.log('Logged out'),
-});
+
 
 // --- Modal Content Components ---
 const PersonalInfoContent = ({ user }) => {
@@ -157,9 +148,44 @@ const ForgotPasswordContent = () => (
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
-  const { user, logout } = useAuth();
+  const { userSession, logout } = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState('');
+
+  const handleLogout = async () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await logout();
+              router.replace('/');
+            } catch (error) {
+              console.error('Logout error:', error);
+              Alert.alert('Error', 'Failed to logout. Please try again.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  // Create user object from session data for compatibility
+  const user = userSession ? {
+    name: userSession.displayName || 'User',
+    consumerNumber: 'HP123456789', // This should come from your user profile data
+    mobile: '+91 98765 43210', // This should come from your user profile data
+    email: userSession.email,
+    address: '123, Main Street, Near Water Tank, Vadodara, Gujarat - 390001' // This should come from your user profile data
+  } : null;
 
   let [fontsLoaded] = useFonts({
     Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold,
@@ -181,6 +207,8 @@ export default function ProfileScreen() {
   if (!fontsLoaded) {
     return <View style={styles.loadingContainer} />;
   }
+
+
   
   const renderModalContent = () => {
       switch(modalContent) {
@@ -249,7 +277,7 @@ export default function ProfileScreen() {
 
         <TouchableOpacity
             style={[styles.menuItem, styles.logoutItem]}
-            onPress={logout}
+            onPress={handleLogout}
           >
             <View style={styles.menuItemLeft}>
               <View style={[styles.menuIcon, styles.logoutIcon]}>

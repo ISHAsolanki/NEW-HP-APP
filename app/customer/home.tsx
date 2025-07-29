@@ -16,13 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 // Import LinearGradient for the gradient effect
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-
-// --- Mock Auth Hook (can be replaced with your actual auth context) ---
-const useAuth = () => {
-  return {
-    user: { name: 'Alpenbhai' }
-  };
-};
+import { useAuth } from '../../core/auth/AuthContext';
 
 // --- Color Palette (Matched with AuthScreen) ---
 const Colors = {
@@ -38,9 +32,16 @@ const Colors = {
 };
 
 export default function CustomerHomeScreen() {
-  const { user } = useAuth();
+  const { userSession, isAuthenticated } = useAuth();
   // Get the safe area insets, specifically the top one for the status bar
   const insets = useSafeAreaInsets();
+
+
+
+  // Create user object from session for compatibility
+  const user = {
+    name: userSession.displayName || 'User'
+  };
 
   // Handler functions for button actions
   const handleOrderRefill = () => {

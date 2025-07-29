@@ -15,7 +15,9 @@ import {
   View
 } from 'react-native';
 import { Colors } from '../../constants/Colors';
-import { FIREBASE_AUTH } from '../../core/firebase/config';
+import { useAuth } from '../../core/auth/AuthContext';
+import { FIREBASE_AUTH } from '../../core/firebase/firebase';
+import { SessionManager, UserSession } from '../../core/session/sessionManager';
 
 // Get screen dimensions for responsive design
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -29,6 +31,7 @@ interface FormData {
 }
 
 export default function AuthScreen() {
+  const { login } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -66,44 +69,45 @@ export default function AuthScreen() {
   };
 
   const handleSubmit = async () => {
-    if (isLoading || !validateForm()) return;
+  if (isLoading || !validateForm()) return;
 
-    setIsLoading(true);
+  setIsLoading(true);
 
-    try {
-      if (isLogin) {
-        // Login with Firebase
-        await signInWithEmailAndPassword(FIREBASE_AUTH, formData.email, formData.password);
-        Alert.alert('Success', 'Login successful!');
-        router.replace('/customer');
-      } else {
-        // Register with Firebase
-        await createUserWithEmailAndPassword(FIREBASE_AUTH, formData.email, formData.password);
-        Alert.alert('Success', 'Registration successful!');
-        router.replace('/customer');
-      }
-    } catch (error: any) {
-      let errorMessage = 'An error occurred. Please try again.';
-      
-      if (error.code === 'auth/email-already-in-use') {
-        errorMessage = 'This email is already registered. Please use a different email or try logging in.';
-      } else if (error.code === 'auth/weak-password') {
-        errorMessage = 'Password is too weak. Please choose a stronger password.';
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = 'Please enter a valid email address.';
-      } else if (error.code === 'auth/user-not-found') {
-        errorMessage = 'No account found with this email. Please check your email or register.';
-      } else if (error.code === 'auth/wrong-password') {
-        errorMessage = 'Incorrect password. Please try again.';
-      } else if (error.code === 'auth/invalid-credential') {
-        errorMessage = 'Invalid email or password. Please check your credentials.';
-      }
-      
-      Alert.alert('Error', errorMessage);
-    } finally {
-      setIsLoading(false);
+  try {
+    let userCredential;
+    
+    if (isLogin) {
+      // Login with Firebase
+      userCredential = await signInWithEmailAndPassword(FIREBASE_AUTH, formData.email, formData.password);
+    } else {
+      // Register with Firebase
+      userCredential = await createUserWithEmailAndPassword(FIREBASE_AUTH, formData.email, formData.password);
     }
-  };
+
+    // Create and save session after successful authentication
+    const userSession: UserSession = {
+      uid: userCredential.user.uid,
+      email: userCredential.user.email || formData.email,
+      displayName: userCredential.user.displayName || formData.name,
+      sessionToken: SessionManager.generateSessionToken(),
+      loginTime: Date.now(),
+    };
+
+    // Use the auth context to handle login
+    await login(userSession);
+    
+    Alert.alert('Success', `${isLogin ? 'Login' : 'Registration'} successful!`);
+    
+    // Add a slight delay before navigation to ensure session is saved
+    setTimeout(() => {
+      router.replace('/customer/home');
+    }, 500);
+  } catch (error: any) {
+    // Error handling code...
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const updateFormData = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));

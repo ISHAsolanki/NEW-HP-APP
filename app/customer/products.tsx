@@ -1,7 +1,7 @@
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold, Inter_800ExtraBold, useFonts } from '@expo-google-fonts/inter';
 import { router } from 'expo-router';
 import { ArrowLeft, ChevronDown, Minus, Plus, Search, ShoppingCart, SlidersHorizontal, X } from 'lucide-react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Image,
   Modal,
@@ -14,6 +14,9 @@ import {
   View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useCart } from '../../core/context/CartContext';
+import { getProducts, Product } from '../../core/services/productService';
+
 
 // --- Modern Color Palette ---
 const Colors = {
@@ -32,46 +35,14 @@ const Colors = {
   accent: '#F59E0B',
 };
 
-// --- Updated Mock Product Data (without ratings/reviews) ---
-const products = [
-  {
-    id: '1',
-    name: 'HP Gas 14.2kg',
-    price: 850,
-    originalPrice: 900,
-    deliveryCharge: 30,
-    description: 'A standard domestic cooking gas cylinder, perfect for everyday kitchen use. Reliable, safe, and delivered to your doorstep.',
-    image: require('../../assets/images/gas-cylinder.jpg'),
-    inStock: true,
-  },
-  {
-    id: '2',
-    name: 'HP Gas 19kg',
-    price: 1200,
-    originalPrice: 1250,
-    deliveryCharge: 50,
-    description: 'A commercial-grade gas cylinder designed for restaurants, hotels, and other high-demand businesses.',
-    image: require('../../assets/images/gas-cylinder.jpg'),
-    inStock: true,
-  },
-  {
-    id: '3',
-    name: 'HP Gas 5kg',
-    price: 450,
-    deliveryCharge: 20,
-    description: 'A small and portable cylinder, ideal for outdoor activities, camping trips, and small-scale cooking needs.',
-    image: require('../../assets/images/gas-cylinder.jpg'),
-    inStock: false,
-  },
-];
 
 // --- Filter Chip Component ---
 const FilterChip = ({ icon, label, hasDropdown }) => (
-    <TouchableOpacity style={styles.chip}>
-        {icon}
-        <Text style={styles.chipText}>{label}</Text>
-        {hasDropdown && <ChevronDown size={16} color={Colors.textSecondary} style={{ marginLeft: 4 }}/>}
-    </TouchableOpacity>
+  <TouchableOpacity style={styles.chip}>
+    {icon}
+    <Text style={styles.chipText}>{label}</Text>
+    {hasDropdown && <ChevronDown size={16} color={Colors.textSecondary} style={{ marginLeft: 4 }} />}
+  </TouchableOpacity>
 );
 
 
@@ -81,6 +52,31 @@ export default function ProductsScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalQuantity, setModalQuantity] = useState(1); // Default quantity to 1
   const [searchQuery, setSearchQuery] = useState('');
+
+
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const { addToCart } = useCart();
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const productsData = await getProducts();
+        setProducts(productsData);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        // Handle error (show error message)
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+
 
   let [fontsLoaded] = useFonts({
     Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold, Inter_800ExtraBold,
@@ -112,7 +108,7 @@ export default function ProductsScreen() {
 
   const getModalTotalPrice = () => {
     if (!selectedProduct) return 0;
-    return (selectedProduct.price * modalQuantity) + selectedProduct.deliveryCharge;
+    return (selectedProduct.price * modalQuantity);
   };
 
   const filteredProducts = products.filter(product =>
@@ -122,36 +118,33 @@ export default function ProductsScreen() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      
+
       {/* Header with solid blue color */}
       <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
         <View style={styles.headerLeft}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.headerIcon}>
-                <ArrowLeft size={26} color={Colors.white} />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>Products</Text>
+          <TouchableOpacity onPress={() => router.back()} style={styles.headerIcon}>
+            <ArrowLeft size={26} color={Colors.white} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Products</Text>
         </View>
         <TouchableOpacity style={styles.headerIcon} onPress={() => router.push('/customer/cart')}>
-            <ShoppingCart size={26} color={Colors.white} />
+          <ShoppingCart size={26} color={Colors.white} />
         </TouchableOpacity>
       </View>
-      
+
       <View style={styles.controlsContainer}>
         <View style={styles.searchContainer}>
-            <Search size={20} color={Colors.textSecondary} style={styles.searchIcon} />
-            <TextInput
-                style={styles.searchInput}
-                placeholder="Search for a cylinder..."
-                placeholderTextColor={Colors.textSecondary}
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-            />
+          <Search size={20} color={Colors.textSecondary} style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search for a cylinder..."
+            placeholderTextColor={Colors.textSecondary}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipContainer}>
-            <FilterChip icon={<SlidersHorizontal size={16} color={Colors.textSecondary} />} label="Filters" />
-            <FilterChip label="Sort By" hasDropdown />
-            <FilterChip label="Price: Low to High" />
-            <FilterChip label="In Stock" />
+          <FilterChip icon={<SlidersHorizontal size={16} color={Colors.textSecondary} />} label="Filters" />
         </ScrollView>
       </View>
 
@@ -163,7 +156,7 @@ export default function ProductsScreen() {
             onPress={() => product.inStock && openProductModal(product)}
             disabled={!product.inStock}
           >
-            <Image source={product.image} style={styles.productImage} />
+            <Image source={{ uri: product.image }} style={styles.productImage} />
             <View style={styles.productInfo}>
               <Text style={styles.productName}>{product.name}</Text>
               <Text style={styles.productDescription} numberOfLines={2}>{product.description}</Text>
@@ -177,9 +170,9 @@ export default function ProductsScreen() {
                 <Plus size={22} color={Colors.white} />
               </View>
             ) : (
-                <View style={styles.outOfStockBadge}>
-                  <Text style={styles.outOfStockText}>Unavailable</Text>
-                </View>
+              <View style={styles.outOfStockBadge}>
+                <Text style={styles.outOfStockText}>Unavailable</Text>
+              </View>
             )}
           </TouchableOpacity>
         ))}
@@ -190,51 +183,58 @@ export default function ProductsScreen() {
         animationType="slide"
         transparent={true}
         visible={modalVisible}
+        statusBarTranslucent={true}
         onRequestClose={closeModal}
       >
         <View style={styles.modalOverlay}>
-            <TouchableOpacity style={{flex: 1}} onPress={closeModal} />
-            <View style={styles.modalContent}>
-                <View style={styles.modalHandle} />
-                <Image source={selectedProduct?.image} style={styles.modalHeroImage} />
-                
-                <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
-                    <X size={24} color={Colors.text} />
-                </TouchableOpacity>
+          <TouchableOpacity style={{ flex: 1 }} onPress={closeModal} />
+          <View style={styles.modalContent}>
+            <View style={styles.modalHandle} />
+            <Image source={{ uri: selectedProduct?.image }} style={styles.modalHeroImage} />
 
-                {selectedProduct && (
-                    <>
-                    <ScrollView style={styles.modalScrollView}>
-                        <View style={styles.modalInfoContainer}>
-                            <Text style={styles.modalTitle}>{selectedProduct.name}</Text>
-                            <Text style={styles.modalDescription}>{selectedProduct.description}</Text>
-                        </View>
-                    </ScrollView>
+            <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+              <X size={24} color={Colors.text} />
+            </TouchableOpacity>
 
-                    <View style={styles.quantitySection}>
-                        <View style={styles.modalQuantitySelector}>
-                            <TouchableOpacity style={styles.modalQuantityButton} onPress={() => adjustModalQuantity('decrease')}>
-                                <Minus size={20} color={Colors.white} />
-                            </TouchableOpacity>
-                            <Text style={styles.modalQuantityText}>{modalQuantity}</Text>
-                            <TouchableOpacity style={styles.modalQuantityButton} onPress={() => adjustModalQuantity('increase')}>
-                                <Plus size={20} color={Colors.white} />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+            {selectedProduct && (
+              <>
+                <ScrollView style={styles.modalScrollView}>
+                  <View style={styles.modalInfoContainer}>
+                    <Text style={styles.modalTitle}>{selectedProduct.name}</Text>
+                    <Text style={styles.modalDescription}>{selectedProduct.description}</Text>
+                  </View>
+                </ScrollView>
 
-                    <View style={[styles.modalActionContainer, {paddingBottom: insets.bottom + 10}]}>
-                        <View>
-                            <Text style={styles.totalLabel}>Total Price</Text>
-                            <Text style={styles.totalAmount}>₹{getModalTotalPrice()}</Text>
-                        </View>
-                        <TouchableOpacity style={styles.modalAddButton} onPress={closeModal}>
-                            <Text style={styles.modalAddButtonText}>Add to Cart</Text>
-                        </TouchableOpacity>
-                    </View>
-                    </>
-                )}
-            </View>
+                <View style={styles.quantitySection}>
+                  <View style={styles.modalQuantitySelector}>
+                    <TouchableOpacity style={styles.modalQuantityButton} onPress={() => adjustModalQuantity('decrease')}>
+                      <Minus size={20} color={Colors.white} />
+                    </TouchableOpacity>
+                    <Text style={styles.modalQuantityText}>{modalQuantity}</Text>
+                    <TouchableOpacity style={styles.modalQuantityButton} onPress={() => adjustModalQuantity('increase')}>
+                      <Plus size={20} color={Colors.white} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                <View style={[styles.modalActionContainer, { paddingBottom: insets.bottom + 10 }]}>
+                  <View>
+                    <Text style={styles.totalLabel}>Total Price</Text>
+                    <Text style={styles.totalAmount}>₹{getModalTotalPrice()}</Text>
+                  </View>
+                  <TouchableOpacity
+                    style={styles.modalAddButton}
+                    onPress={() => {
+                      addToCart(selectedProduct, modalQuantity);
+                      closeModal();
+                    }}
+                  >
+                    <Text style={styles.modalAddButtonText}>Add to Cart</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
+          </View>
         </View>
       </Modal>
     </View>
@@ -258,13 +258,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerIcon: { padding: 8 },
-  headerTitle: { 
-    fontSize: 20, 
-    fontFamily: 'Inter_600SemiBold', 
+  headerTitle: {
+    fontSize: 20,
+    fontFamily: 'Inter_600SemiBold',
     color: Colors.white,
     marginLeft: 12,
   },
-  
+
   controlsContainer: {
     paddingTop: 16,
     paddingBottom: 8,
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.textSecondary,
   },
-  
+
   content: { padding: 20, paddingBottom: 40 },
   productCard: {
     backgroundColor: Colors.surface,
@@ -320,11 +320,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: Colors.textSecondary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.1,
-    shadowRadius: 20,
-    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.07,
+    shadowRadius: 15,
+    elevation: 5,
     borderWidth: 1,
     borderColor: 'rgba(224, 224, 224, 0.5)',
   },
@@ -336,28 +336,28 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   productInfo: { flex: 1 },
-  productName: { 
-    fontSize: 17, 
-    fontFamily: 'Inter_700Bold', 
-    color: Colors.text, 
+  productName: {
+    fontSize: 17,
+    fontFamily: 'Inter_700Bold',
+    color: Colors.text,
     marginBottom: 4
   },
-  productDescription: { 
-    fontSize: 13, 
-    fontFamily: 'Inter_400Regular', 
-    color: Colors.textSecondary, 
+  productDescription: {
+    fontSize: 13,
+    fontFamily: 'Inter_400Regular',
+    color: Colors.textSecondary,
     lineHeight: 18,
     marginBottom: 12,
   },
-  priceContainer: { 
-    flexDirection: 'row', 
+  priceContainer: {
+    flexDirection: 'row',
     alignItems: 'baseline',
   },
-  price: { 
-    fontSize: 18, 
-    fontFamily: 'Inter_700Bold', 
-    color: Colors.primary, 
-    marginRight: 8 
+  price: {
+    fontSize: 18,
+    fontFamily: 'Inter_700Bold',
+    color: Colors.primary,
+    marginRight: 8
   },
   originalPrice: {
     fontSize: 14,
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   outOfStockText: { fontSize: 12, color: Colors.error, fontFamily: 'Inter_600SemiBold' },
-  
+
   // --- REFINED MODAL STYLES ---
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   modalContent: {
@@ -413,31 +413,31 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   modalHeroImage: {
-      width: 160,
-      height: 240,
-      resizeMode: 'cover',
-      alignSelf: 'center',
+    width: 160,
+    height: 240,
+    resizeMode: 'cover',
+    alignSelf: 'center',
   },
   modalScrollView: {
-      maxHeight: 150,
+    maxHeight: 150,
   },
   modalInfoContainer: {
-      padding: 20,
-      paddingBottom: 12,
+    padding: 20,
+    paddingBottom: 12,
   },
-  modalTitle: { 
+  modalTitle: {
     fontSize: 24,
-    fontFamily: 'Inter_700Bold', 
+    fontFamily: 'Inter_700Bold',
     color: Colors.text,
-    alignSelf: 'center', 
+    alignSelf: 'center',
     marginBottom: 12
   },
-  modalDescription: { 
+  modalDescription: {
     fontSize: 15,
-    fontFamily: 'Inter_400Regular', 
-    color: Colors.textSecondary, 
+    fontFamily: 'Inter_400Regular',
+    color: Colors.textSecondary,
     textAlign: 'center',
-    lineHeight: 22, 
+    lineHeight: 22,
   },
   quantitySection: {
     marginTop: 4,
@@ -464,11 +464,11 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  modalQuantityText: { 
-      fontSize: 20,
-      fontFamily: 'Inter_700Bold', 
-      color: Colors.text, 
-      marginHorizontal: 26,
+  modalQuantityText: {
+    fontSize: 20,
+    fontFamily: 'Inter_700Bold',
+    color: Colors.text,
+    marginHorizontal: 26,
   },
   modalActionContainer: {
     flexDirection: 'row',
@@ -485,30 +485,30 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   totalLabel: {
-      fontSize: 14,
-      fontFamily: 'Inter_500Medium',
-      color: Colors.textSecondary,
+    fontSize: 14,
+    fontFamily: 'Inter_500Medium',
+    color: Colors.textSecondary,
   },
   totalAmount: {
-      fontSize: 22,
-      fontFamily: 'Inter_700Bold',
-      color: Colors.text,
+    fontSize: 22,
+    fontFamily: 'Inter_700Bold',
+    color: Colors.text,
   },
   modalAddButton: {
-      backgroundColor: Colors.primary,
-      paddingVertical: 14,
-      paddingHorizontal: 32,
-      borderRadius: 12,
-      shadowColor: Colors.primary,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.2,
-      shadowRadius: 8,
-      elevation: 5,
+    backgroundColor: Colors.primary,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
   modalAddButtonText: {
-      color: Colors.white,
-      fontFamily: 'Inter_700Bold',
-      fontSize: 16,
+    color: Colors.white,
+    fontFamily: 'Inter_700Bold',
+    fontSize: 16,
   },
 });
 

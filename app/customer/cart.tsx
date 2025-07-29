@@ -4,6 +4,7 @@ import { ArrowLeft, CheckCircle, Minus, Plus, Tag } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Image, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useCart } from '../../core/context/CartContext';
 
 // --- Color Palette (Matched with previous screens) ---
 const Colors = {
@@ -40,7 +41,7 @@ const initialCartItems = [
 
 export default function CartScreen() {
   const insets = useSafeAreaInsets();
-  const [cartItems, setCartItems] = useState(initialCartItems);
+  const { cartItems, loading, updateQuantity, removeFromCart, getCartTotal } = useCart();
   const [promoCode, setPromoCode] = useState('');
   const [discount, setDiscount] = useState(0);
 
@@ -53,21 +54,22 @@ export default function CartScreen() {
   }
 
   const handleQuantityChange = (itemId, type) => {
-      setCartItems(currentItems => 
-          currentItems.map(item => {
-              if (item.id === itemId) {
-                  let newQuantity = item.quantity;
-                  if (type === 'increase') {
-                      newQuantity++;
-                  } else if (type === 'decrease') {
-                      newQuantity = item.quantity > 1 ? item.quantity - 1 : 0;
-                  }
-                  return { ...item, quantity: newQuantity };
-              }
-              return item;
-          }).filter(item => item.quantity > 0)
-      );
-  };
+  const item = cartItems.find(item => item.id === itemId);
+  if (!item) return;
+  
+  let newQuantity = item.quantity;
+  if (type === 'increase') {
+    newQuantity++;
+  } else if (type === 'decrease') {
+    newQuantity = item.quantity > 1 ? item.quantity - 1 : 0;
+  }
+  
+  if (newQuantity === 0) {
+    removeFromCart(itemId);
+  } else {
+    updateQuantity(itemId, newQuantity);
+  }
+};
   
   const handleApplyPromo = () => {
       if (promoCode.toUpperCase() === 'SAVE50') {
@@ -78,7 +80,7 @@ export default function CartScreen() {
   };
 
   const calculateSubtotal = () => {
-      return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+      return getCartTotal();
   };
 
   const deliveryCharge = 30;
@@ -87,23 +89,23 @@ export default function CartScreen() {
   const totalAmount = subtotal + deliveryCharge + gstAmount - discount;
 
   const renderCartItem = (item) => (
-    <View key={item.id} style={styles.itemCard}>
-        <Image source={item.image} style={styles.itemImage} />
-        <View style={styles.itemDetails}>
-            <Text style={styles.itemName}>{item.product}</Text>
-            <Text style={styles.itemPrice}>₹{item.price}</Text>
-        </View>
-        <View style={styles.quantitySelector}>
-            <TouchableOpacity style={styles.quantityButton} onPress={() => handleQuantityChange(item.id, 'decrease')}>
-                <Minus size={16} color={Colors.white} />
-            </TouchableOpacity>
-            <Text style={styles.quantityText}>{item.quantity}</Text>
-            <TouchableOpacity style={styles.quantityButton} onPress={() => handleQuantityChange(item.id, 'increase')}>
-                <Plus size={16} color={Colors.white} />
-            </TouchableOpacity>
-        </View>
+  <View key={item.id} style={styles.itemCard}>
+    <Image source={{ uri: item.product.image }} style={styles.itemImage} />
+    <View style={styles.itemDetails}>
+      <Text style={styles.itemName}>{item.product.name}</Text>
+      <Text style={styles.itemPrice}>₹{item.product.price}</Text>
     </View>
-  );
+    <View style={styles.quantitySelector}>
+      <TouchableOpacity style={styles.quantityButton} onPress={() => handleQuantityChange(item.id, 'decrease')}>
+        <Minus size={16} color={Colors.white} />
+      </TouchableOpacity>
+      <Text style={styles.quantityText}>{item.quantity}</Text>
+      <TouchableOpacity style={styles.quantityButton} onPress={() => handleQuantityChange(item.id, 'increase')}>
+        <Plus size={16} color={Colors.white} />
+      </TouchableOpacity>
+    </View>
+  </View>
+);
 
   return (
     <View style={styles.container}>
