@@ -1,3 +1,4 @@
+// Updated file: app/index.tsx
 import { router } from 'expo-router';
 import React, { useEffect } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
@@ -5,14 +6,20 @@ import { useAuth } from '../core/auth/AuthContext';
 import AuthScreen from './auth/auth';
 
 export default function Index() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, userSession } = useAuth();
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      // User is authenticated, redirect to customer home
-      router.replace('/customer/home');
+    if (!isLoading && isAuthenticated && userSession) {
+      // Redirect based on user role
+      if (userSession.role === 'admin') {
+        router.replace('/admin/admindashboard');
+      } else if (userSession.role === 'delivery') {
+        router.replace('/delivery/deliverydashboard');
+      } else {
+        router.replace('/customer/home');
+      }
     }
-  }, [isAuthenticated, isLoading]);
+  }, [isAuthenticated, isLoading, userSession]);
 
   // Show loading spinner while checking authentication
   if (isLoading) {

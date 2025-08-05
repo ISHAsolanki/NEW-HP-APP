@@ -9,11 +9,12 @@ export interface Product {
   id?: string;
   name: string;
   type: string;
-  weight: number;
+  weight?: number; // Made optional since we're not using it in the admin form
   price: number;
   originalPrice?: number;
   deliveryCharge?: number;
   inStock: boolean;
+  quantity?: number; // Admin-only field for stock quantity
   image: string;
   description: string;
   createdAt: any;

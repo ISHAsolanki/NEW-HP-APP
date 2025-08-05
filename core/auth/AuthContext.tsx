@@ -1,6 +1,7 @@
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { FIREBASE_AUTH } from '../firebase/firebase';
+import { userService } from '../services/userService';
 import { SessionManager, UserSession } from '../session/sessionManager';
 
 interface AuthContextType {
@@ -51,12 +52,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initializeAuth();
 
     // Listen to Firebase auth state changes
-    const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, async (firebaseUser) => {
       console.log('Firebase auth state changed:', firebaseUser ? 'User authenticated' : 'User not authenticated');
       setUser(firebaseUser);
       
-      // If Firebase user is null but we have a session, clear the session
-      if (!firebaseUser && userSession) {
+      if (firebaseUser && !userSession) {
+        // Firebase user is authenticated but we don't have a session
+        // This happens when user logs in or when app restarts with authenticated user
+        try {
+          const userData = await userService.getUserById(firebaseUser.uid);
+          if (userData) {
+            const newSession: UserSession = {
+              uid: firebaseUser.uid,
+              email: firebaseUser.email || userData.email,
+              displayName: firebaseUser.displayName || userData.displayName,
+              role: userData.role || 'customer',
+              sessionToken: SessionManager.generateSessionToken(),
+              loginTime: Date.now(),
+            };
+            
+            await SessionManager.saveSession(newSession);
+            setUserSession(newSession);
+            console.log('Created session from Firebase auth for:', newSession.email, 'Role:', newSession.role);
+          }
+        } catch (error) {
+          console.error('Error creating session from Firebase user:', error);
+        }
+      } else if (!firebaseUser && userSession) {
+        // Firebase user is null but we have a session, clear the session
         handleLogout();
       }
       

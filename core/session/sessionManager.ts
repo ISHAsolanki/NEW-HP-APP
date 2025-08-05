@@ -6,9 +6,10 @@ export interface UserSession {
   uid: string;
   email: string;
   displayName?: string;
+  role?: string;
   sessionToken: string;
   loginTime: number;
-  expiresAt?: number; // Optional expiration time
+  expiresAt?: number;
 }
 
 export class SessionManager {

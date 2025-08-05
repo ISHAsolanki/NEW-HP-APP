@@ -11,6 +11,8 @@ export default function RootLayout() {
           <Stack.Screen name="index" />
           <Stack.Screen name="auth/auth" />
           <Stack.Screen name="customer" options={{ headerShown: false }} />
+          <Stack.Screen name="admin" options={{ headerShown: false }} />
+          <Stack.Screen name="delivery" options={{ headerShown: false }} />
         </Stack>
       </CartProvider>
     </AuthProvider>

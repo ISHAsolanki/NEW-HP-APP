@@ -1,22 +1,24 @@
 import { router } from 'expo-router';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { Eye, EyeOff, Mail, Phone, User } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  Dimensions,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+    ActivityIndicator,
+    Alert,
+    Dimensions,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import { Colors } from '../../constants/Colors';
 import { useAuth } from '../../core/auth/AuthContext';
 import { FIREBASE_AUTH } from '../../core/firebase/firebase';
+
+import { userService } from '../../core/services/userService';
 import { SessionManager, UserSession } from '../../core/session/sessionManager';
 
 // Get screen dimensions for responsive design
@@ -75,13 +77,34 @@ export default function AuthScreen() {
 
   try {
     let userCredential;
-    
+    let userData;
+
     if (isLogin) {
       // Login with Firebase
       userCredential = await signInWithEmailAndPassword(FIREBASE_AUTH, formData.email, formData.password);
+      
+      // Get user data from Firestore
+      userData = await userService.getUserById(userCredential.user.uid);
     } else {
       // Register with Firebase
       userCredential = await createUserWithEmailAndPassword(FIREBASE_AUTH, formData.email, formData.password);
+      
+      // Update Firebase Auth profile
+      await updateProfile(userCredential.user, {
+        displayName: formData.name
+      });
+      
+      // Create user in Firestore
+      await userService.createUser({
+        uid: userCredential.user.uid,
+        email: formData.email,
+        displayName: formData.name,
+        phoneNumber: formData.phone,
+        role: 'customer' // Default role for new users
+      });
+      
+      // Get the created user data
+      userData = await userService.getUserById(userCredential.user.uid);
     }
 
     // Create and save session after successful authentication
@@ -89,21 +112,33 @@ export default function AuthScreen() {
       uid: userCredential.user.uid,
       email: userCredential.user.email || formData.email,
       displayName: userCredential.user.displayName || formData.name,
+      role: userData?.role || 'customer', // Use role from Firestore
       sessionToken: SessionManager.generateSessionToken(),
       loginTime: Date.now(),
     };
 
     // Use the auth context to handle login
     await login(userSession);
-    
+
     Alert.alert('Success', `${isLogin ? 'Login' : 'Registration'} successful!`);
-    
+
     // Add a slight delay before navigation to ensure session is saved
     setTimeout(() => {
-      router.replace('/customer/home');
+      // Redirect based on role
+      if (userSession.role === 'admin') {
+        router.replace('/admin/admindashboard');
+      } else if (userSession.role === 'delivery') {
+        router.replace('/delivery/deliverydashboard');
+      } else {
+        router.replace('/customer/home');
+      }
     }, 500);
   } catch (error: any) {
-    // Error handling code...
+    console.error('Authentication error:', error);
+    Alert.alert(
+      'Authentication Error',
+      error.message || 'An error occurred during authentication.'
+    );
   } finally {
     setIsLoading(false);
   }
