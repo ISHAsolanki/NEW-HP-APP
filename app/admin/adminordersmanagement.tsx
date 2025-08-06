@@ -4,6 +4,7 @@ import { ArrowLeft, Check, Plus, Search, User, X } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Modal, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { PermissionProtectedRoute } from '../../core/auth/PermissionProtectedRoute';
 
 // --- Color Palette (Matched with other pages) ---
 const Colors = {
@@ -205,7 +206,8 @@ export default function AdminOrdersScreen({ navigation }) {
   );
 
   return (
-    <View style={styles.container}>
+    <PermissionProtectedRoute requiredPermission="orders">
+      <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       
       <LinearGradient
@@ -403,7 +405,8 @@ export default function AdminOrdersScreen({ navigation }) {
             </View>
         </View>
       </Modal>
-    </View>
+      </View>
+    </PermissionProtectedRoute>
   );
 }
 

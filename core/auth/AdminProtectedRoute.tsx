@@ -16,8 +16,8 @@ export const AdminProtectedRoute: React.FC<AdminProtectedRouteProps> = ({ childr
       if (!isAuthenticated || !userSession) {
         // User is not authenticated, redirect to auth screen
         router.replace('/');
-      } else if (userSession.role !== 'admin') {
-        // User is authenticated but not an admin, redirect based on role
+      } else if (userSession.role !== 'admin' && userSession.role !== 'sub-admin') {
+        // User is authenticated but not an admin or sub-admin, redirect based on role
         if (userSession.role === 'delivery') {
           router.replace('/delivery/deliverydashboard');
         } else {

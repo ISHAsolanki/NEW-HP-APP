@@ -8,7 +8,14 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "seed": "node ./scripts/seedDatabase.js",
+    "seed-admin": "node ./scripts/seedDatabaseAdmin.js",
+    "clear-db": "node ./scripts/clearDatabase.js",
+    "reseed": "node ./scripts/clearDatabase.js && node ./scripts/seedDatabase.js",
+    "migrate-users": "node ./scripts/migrateUsersTable.js",
+    "check-users": "node ./scripts/checkUsersTable.js",
+    "check-users-detailed": "node ./scripts/checkUsersTable.js --detailed"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.1",

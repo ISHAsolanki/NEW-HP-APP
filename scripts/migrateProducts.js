@@ -4,13 +4,13 @@ const { getFirestore, addDoc, collection, serverTimestamp } = require('firebase/
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAv-grPhQLLoxpIIOG9t5LEK0m8diSszOo",
-  authDomain: "vihar-app-3904d.firebaseapp.com",
-  projectId: "vihar-app-3904d",
-  storageBucket: "vihar-app-3904d.firebasestorage.app",
-  messagingSenderId: "478628203908",
-  appId: "1:478628203908:web:84b7aedd9524d31cac21d1",
-  measurementId: "G-PT3NTEJMG5"
+  apiKey: "AIzaSyBkaEpBFuUizKnjl6LAt6FEx499pDHVPZs",
+  authDomain: "vihar-app-f6b07.firebaseapp.com",
+  projectId: "vihar-app-f6b07",
+  storageBucket: "vihar-app-f6b07.firebasestorage.app",
+  messagingSenderId: "768229718089",
+  appId: "1:768229718089:web:e0fde908462429e731e798",
+  measurementId: "G-441FJPXRL5"
 };
 
 // Initialize Firebase

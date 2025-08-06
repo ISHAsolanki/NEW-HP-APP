@@ -31,12 +31,21 @@ export default function AdminDashboardScreen() {
     Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold,
   });
 
-  const stats = [
-    { title: 'Total Orders', value: '156', icon: Package },
-    { title: 'Customers', value: '89', icon: Users },
-    { title: 'Delivery Agents', value: '12', icon: Truck },
-    { title: 'Total Earnings', value: '₹50,000', icon: TrendingUp },
+  // Check if user has permission (for sub-admins) or is full admin
+  const hasPermission = (permission: string) => {
+    if (userSession?.role === 'admin') return true; // Full admin has all permissions
+    return userSession?.permissions?.includes(permission) || false;
+  };
+
+  // Filter stats based on permissions
+  const allStats = [
+    { title: 'Total Orders', value: '156', icon: Package, permission: 'orders' },
+    { title: 'Customers', value: '89', icon: Users, permission: null }, // Always visible
+    { title: 'Delivery Agents', value: '12', icon: Truck, permission: 'delivery' },
+    { title: 'Total Earnings', value: '₹50,000', icon: TrendingUp, permission: null }, // Always visible
   ];
+
+  const stats = allStats.filter(stat => !stat.permission || hasPermission(stat.permission));
 
   const recentOrders = [
     { id: 'ORD001', customer: 'Isha Solanki', product: 'HP Gas 14.2kg', status: 'Pending', amount: '₹880' },
@@ -65,8 +74,15 @@ export default function AdminDashboardScreen() {
         colors={[Colors.primaryLight, Colors.primary]}
         style={[styles.header, { paddingTop: insets.top + 10 }]}
       >
-        <Text style={styles.headerTitle}>Admin Dashboard</Text>
+        <Text style={styles.headerTitle}>
+          {userSession?.role === 'sub-admin' ? 'Sub-Admin Dashboard' : 'Admin Dashboard'}
+        </Text>
         <Text style={styles.headerSubtitle}>Welcome, {userSession?.displayName || 'Admin'}!</Text>
+        {userSession?.role === 'sub-admin' && (
+          <Text style={styles.permissionInfo}>
+            Access: {userSession?.permissions?.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(', ') || 'Limited'}
+          </Text>
+        )}
       </LinearGradient>
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -131,6 +147,18 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_400Regular',
     color: Colors.white,
     opacity: 0.8,
+  },
+  permissionInfo: {
+    fontSize: 12,
+    fontFamily: 'Inter_500Medium',
+    color: Colors.white,
+    opacity: 0.9,
+    marginTop: 4,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
   },
   content: {
     padding: 20,

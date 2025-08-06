@@ -246,7 +246,8 @@ export default function AdminProductsScreen({ navigation }: { navigation: any })
   );
 
   return (
-    <View style={styles.container}>
+    <PermissionProtectedRoute requiredPermission="products">
+      <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       
       <LinearGradient
@@ -506,7 +507,8 @@ export default function AdminProductsScreen({ navigation }: { navigation: any })
           </View>
         </View>
       </Modal>
-    </View>
+      </View>
+    </PermissionProtectedRoute>
   );
 }
 

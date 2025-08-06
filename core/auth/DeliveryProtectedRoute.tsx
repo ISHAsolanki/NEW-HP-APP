@@ -18,7 +18,7 @@ export const DeliveryProtectedRoute: React.FC<DeliveryProtectedRouteProps> = ({ 
         router.replace('/');
       } else if (userSession.role !== 'delivery') {
         // User is authenticated but not a delivery agent, redirect based on role
-        if (userSession.role === 'admin') {
+        if (userSession.role === 'admin' || userSession.role === 'sub-admin') {
           router.replace('/admin/admindashboard');
         } else {
           router.replace('/customer/home');

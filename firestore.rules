@@ -1,0 +1,43 @@
+// Firestore Security Rules for HP Gas App
+// These rules allow authenticated users to read/write data based on their roles
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Users collection - users can read/write their own data, admins can read/write all
+    match /users/{userId} {
+      allow read, write: if request.auth != null && 
+        (request.auth.uid == userId || 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'sub-admin']);
+    }
+    
+    // Products collection - everyone can read, only admins/sub-admins can write
+    match /products/{productId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'sub-admin'];
+    }
+    
+    // Orders collection - users can read/write their own orders, admins/delivery can read/write all
+    match /orders/{orderId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        (resource.data.customerId == request.auth.uid || 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'sub-admin', 'delivery']);
+    }
+    
+    // Delivery agents collection - only admins can read/write
+    match /delivery_agents/{agentId} {
+      allow read, write: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'sub-admin'];
+    }
+    
+    // Temporary rule for seeding - REMOVE THIS IN PRODUCTION
+    // This allows any authenticated user to write during seeding
+    match /{document=**} {
+      allow read, write: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+  }
+}

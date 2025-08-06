@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Modal, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../core/auth/AuthContext';
+import { PermissionProtectedRoute } from '../../core/auth/PermissionProtectedRoute';
 import { DeliveryAgent, deliveryAgentService } from '../../core/services/deliveryAgentService';
 
 // --- Color Palette (Matched with other pages) ---
@@ -230,7 +231,8 @@ export default function AdminDeliveryAgentScreen({ navigation }: { navigation: a
   );
 
   return (
-    <View style={styles.container}>
+    <PermissionProtectedRoute requiredPermission="delivery">
+      <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       
       <LinearGradient
@@ -427,7 +429,8 @@ export default function AdminDeliveryAgentScreen({ navigation }: { navigation: a
           </View>
         </View>
       </Modal>
-    </View>
+      </View>
+    </PermissionProtectedRoute>
   );
 }
 

@@ -8,6 +8,7 @@ export interface UserData {
   email: string;
   displayName: string;
   role: string;
+  permissions?: string[]; // Array of allowed pages for sub-admin
   phoneNumber?: string;
   createdAt: number;
   updatedAt: number;
@@ -61,5 +62,29 @@ export const userService = {
       role,
       updatedAt: Date.now(),
     });
+  },
+
+  // Update user permissions (for sub-admin)
+  async updateUserPermissions(uid: string, permissions: string[]): Promise<void> {
+    const userRef = doc(FIREBASE_DB, 'users', uid);
+    await updateDoc(userRef, {
+      permissions,
+      updatedAt: Date.now(),
+    });
+  },
+
+  // Update user role and permissions
+  async updateUserRoleAndPermissions(uid: string, role: string, permissions?: string[]): Promise<void> {
+    const userRef = doc(FIREBASE_DB, 'users', uid);
+    const updateData: any = {
+      role,
+      updatedAt: Date.now(),
+    };
+    
+    if (permissions !== undefined) {
+      updateData.permissions = permissions;
+    }
+    
+    await updateDoc(userRef, updateData);
   }
 };

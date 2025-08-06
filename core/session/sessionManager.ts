@@ -7,6 +7,7 @@ export interface UserSession {
   email: string;
   displayName?: string;
   role?: string;
+  permissions?: string[]; // Array of allowed pages for sub-admin
   sessionToken: string;
   loginTime: number;
   expiresAt?: number;
